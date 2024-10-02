@@ -1,69 +1,38 @@
 const express = require('express');
 const path = require('path');
-const app = express();
 const session = require('express-session');
+const mysql = require('mysql2');
+const bcrypt = require('bcrypt'); // Asegúrate de instalar bcrypt
 const articulosRoutes = require('./routes/articulosdb');
-// const autoresRoutes = require('./routes/autoresdb');
-// settings
-app.set('port', 3000)
 
+const app = express();
+app.set('port', 3000);
 
-// middleware
+// Configuración de la conexión a la base de datos
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'llluuuhhh',
+    database: 'periodico'
+});
+
+// Middleware
 app.use(express.static(path.join(__dirname, 'public')));
-
-// Para poder manejar JSON en peticiones
 app.use(express.json());
-// Configuración de la sesión
 app.use(session({
-    secret: 'mi_secreto', // Cambia esto a algo seguro
+    secret: 'mi_secreto',
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false } // Cambia a true si usas HTTPS
 }));
 
-// routes
+// Rutas
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
-})
+});
 
-// Para manejar artículos js 
+// Ruta para manejar artículos
 app.use('/api/articulos', articulosRoutes);
-
-// Para manejar autores js
-// app.use('/autoresdb', autoresRoutes);
-
-app.listen(app.get('port'),()=>{
-    console.log(`Aplicacion corriendo en el puerto ${app.get('port')}`);
-    
-})
-
-
-// Middleware para verificar roles
-function checkRole(role) {
-    return (req, res, next) => {
-        if (req.session.role === role) {
-            return next();
-        } else {
-            return res.status(403).send('Acceso denegado');
-        }
-    };
-}
-
-// // Rutas protegidas por roles
-// app.get('/admin', checkRole('DBA'), (req, res) => {
-//     res.send('Área de administración');
-// });
-
-// app.get('/lectura', checkRole('solo_lectura'), (req, res) => {
-//     res.send('Área de solo lectura');
-// });
-
-// app.get('/modificaciones', checkRole('modificaciones'), (req, res) => {
-//     res.send('Área de modificaciones');
-// });
-
-
-
 
 // Ruta para la página de inicio de sesión
 app.get('/login', (req, res) => {
@@ -75,24 +44,32 @@ app.get('/articulos', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'articulos.html'));
 });
 
-// Ruta para la interfaz de artículos
-app.get('/interfaz-articulos', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'interfaz-articulos.html'));
-});
+// Ruta para manejar el inicio de sesión
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
 
+    console.log('Intentando iniciar sesión con:', username, password);
 
-
-
-// Ruta para obtener todos los artículos
-app.get('/api/articulos', (req, res) => {
-    connection.query('SELECT * FROM Articulos', (error, results) => {
+    // Aquí deberías verificar el usuario y la contraseña
+    const query = 'SELECT * FROM Usuarios WHERE username = ? AND password = ?';
+    connection.query(query, [username, password], (error, results) => {
         if (error) {
-            return res.status(500).send('Error al obtener artículos');
+            return res.status(500).json({ message: 'Error en la base de datos' });
         }
-        res.json(results); // Retorna los artículos en formato JSON
+
+        if (results.length > 0) {
+            // Autenticación exitosa
+            req.session.username = username; // Guardar información del usuario en la sesión
+            req.session.role = results[0].role; // Guardar el rol del usuario en la sesión
+            res.json({ message: 'Inicio de sesión exitoso', role: req.session.role });
+        } else {
+            // Autenticación fallida
+            res.status(401).json({ message: 'Usuario o contraseña incorrectos' });
+        }
+        
     });
 });
 
-
-
-
+app.listen(3000, () => {
+    console.log('Servidor escuchando en http://localhost:3000');
+});

@@ -1,0 +1,160 @@
+/* General styles for other pages */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* Header styles */
+header {
+    background-color: #0044cc;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+}
+
+/* Articles container styles */
+main {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* Articles section styles */
+#articulos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+article {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 300px;
+    transition: transform 0.2s;
+}
+
+article:hover {
+    transform: translateY(-5px);
+}
+
+article h2 {
+    margin-top: 0;
+    font-size: 1.5em;
+    color: #0044cc;
+}
+
+article p {
+    line-height: 1.6;
+}
+
+article p:last-child {
+    font-size: 0.9em;
+    color: #777;
+}
+
+/* Footer styles */
+footer {
+    background-color: #0044cc;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    margin-top: 30px;
+}
+
+footer p {
+    margin: 0;
+}
+
+/* Styles specific for login page */
+body.login-page {
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Hace que el body ocupe toda la altura de la ventana */
+}
+
+body.login-page .login-container {
+    width: 300px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+body.login-page h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+body.login-page .input-group {
+    margin-bottom: 20px; /* Incrementa el margen inferior para más espacio */
+}
+
+body.login-page .input-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+body.login-page .input-group input {
+    width: 100%; /* Ajusta el ancho al contenedor */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 5px; /* Añade un margen superior para separación */
+    box-sizing: border-box; /* Asegura que el padding y borde estén incluidos en el width */
+}
+
+body.login-page button {
+    width: 100%;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+body.login-page button:hover {
+    background-color: #218838;
+}
+
+body.login-page p {
+    text-align: center;
+    margin-top: 20px;
+}
+
+body.login-page p a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+body.login-page p a:hover {
+    text-decoration: underline;
+}
+
+/* Media query for mobile devices */
+@media (max-width: 600px) {
+    #articulos {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    article {
+        width: 100%;
+    }
+}
