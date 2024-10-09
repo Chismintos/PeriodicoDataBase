@@ -2,19 +2,10 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const mysql = require('mysql2');
-const bcrypt = require('bcrypt'); // Asegúrate de instalar bcrypt
 const articulosRoutes = require('./routes/articulosdb');
 
 const app = express();
 app.set('port', 3000);
-
-// Configuración de la conexión a la base de datos
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'llluuuhhh',
-    database: 'periodico'
-});
 
 // Middleware
 app.use(express.static(path.join(__dirname, 'public')));
@@ -44,32 +35,60 @@ app.get('/articulos', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'articulos.html'));
 });
 
+// Función para autenticar al usuario en la base de datos
+function authenticateUser(username, password, callback) {
+    const connection = mysql.createConnection({
+        host: 'localhost',
+        user: username,     // Usuario ingresado desde el frontend (userDesarrollador, userLectura, etc.)
+        password: password, // Contraseña ingresada desde el frontend
+        database: 'periodico'
+    });
+
+    connection.connect((err) => {
+        if (err) {
+            console.error('Error de autenticación:', err);
+            callback(null, 'Error de autenticación');
+        } else {
+            console.log('Conexión exitosa como:', username);
+            callback(connection, null);  // Devuelve la conexión si es exitosa
+        }
+    });
+}
+
 // Ruta para manejar el inicio de sesión
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
 
     console.log('Intentando iniciar sesión con:', username, password);
 
-    // Aquí deberías verificar el usuario y la contraseña
-    const query = 'SELECT * FROM Usuarios WHERE username = ? AND password = ?';
-    connection.query(query, [username, password], (error, results) => {
+    // Usar la función para autenticar
+    authenticateUser(username, password, (connection, error) => {
         if (error) {
-            return res.status(500).json({ message: 'Error en la base de datos' });
+            return res.status(401).json({ message: 'Credenciales incorrectas' });
         }
 
-        if (results.length > 0) {
-            // Autenticación exitosa
-            req.session.username = username; // Guardar información del usuario en la sesión
-            req.session.role = results[0].role; // Guardar el rol del usuario en la sesión
-            res.json({ message: 'Inicio de sesión exitoso', role: req.session.role });
-        } else {
-            // Autenticación fallida
-            res.status(401).json({ message: 'Usuario o contraseña incorrectos' });
+        // Dependiendo del usuario conectado, asignar un tipo de usuario
+        let userType;
+        if (username === 'userDesarrollador') {
+            userType = 'Desarrollador'; // Cambiado a 'Desarrollador'
+        } else if (username === 'userLectura') {
+            userType = 'Lector'; // Cambiado a 'Lector'
+        } else if (username === 'userDBA') {
+            userType = 'Administrador'; // Cambiado a 'Administrador'
         }
+
+        // Guardar el tipo de usuario en sesión
+        req.session.userType = userType;
         
+        // Puedes usar la conexión más adelante si lo necesitas
+        connection.end();  // Cierra la conexión después de la autenticación
+        
+        res.json({ message: 'Inicio de sesión exitoso', role: userType }); // Cambiado a 'role'
     });
 });
 
+
+// Iniciar el servidor
 app.listen(3000, () => {
     console.log('Servidor escuchando en http://localhost:3000');
 });

@@ -1,27 +1,25 @@
-<form id="loginForm">
-    <input type="text" name="username" placeholder="Usuario" required>
-    <input type="password" name="password" placeholder="Contraseña" required>
-    <button type="submit">Iniciar sesión</button>
-</form>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Inicio</title>
+    <script>
+        // Verifica si el usuario está autenticado
+        document.addEventListener("DOMContentLoaded", function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn'); // Suponiendo que guardas este estado en localStorage
 
-<script>
-    document.getElementById('loginForm').onsubmit = async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData);
-
-        const response = await fetch('/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
+            if (!isLoggedIn) {
+                // Si no hay usuario autenticado, redirige al login
+                window.location.href = '/login.html';
+            } else {
+                // Si está autenticado, puedes mostrar contenido de la página principal o redirigir a otra página
+                // window.location.href = '/articulos.html'; // Por ejemplo
+            }
         });
-
-        if (response.ok) {
-            window.location.href = '/articulos'; // Redirigir si la sesión fue exitosa
-        } else {
-            alert('Error al iniciar sesión');
-        }
-    };
-</script>
+    </script>
+</head>
+<body>
+    <h1>Bienvenido a la página principal</h1>
+</body>
+</html>

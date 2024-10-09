@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Artículos Recientes</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <script src="/js/articulos.js" defer></script>
-
+    <title>Artículos</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <header>
-        <h1>Artículos Recientes</h1>
-        
-    </header>
-    <main>
-        <section id="articulos"> <!-- Cambia el id a "articulos" -->
-            <!-- Aquí se agregarán los artículos mediante JavaScript -->
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2024 Periódico</p>
-    </footer>
+    <h1>Artículos</h1>
+    <div id="articulos"></div> <!-- Contenedor para los artículos -->
+    
+    <!-- Este formulario estará oculto por defecto -->
+    <div id="formularioArticulo" style="display:none;">
+        <h2>Agregar Artículo</h2>
+        <form id="nuevoArticuloForm">
+            <label>Título: <input type="text" id="titulo" required></label><br>
+            <label>Contenido: <textarea id="contenido" required></textarea></label><br>
+            <label>Autor: <input type="text" id="autor" required></label><br>
+            <button type="submit">Guardar Artículo</button>
+        </form>
+    </div>
+
+    <script src="/js/articulos.js"></script>
 </body>
 </html>
