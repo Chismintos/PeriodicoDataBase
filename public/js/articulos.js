@@ -47,7 +47,27 @@ fetch('/api/articulos')
             addArticleButton.addEventListener('click', mostrarFormularioArticulo);
             container.appendChild(addArticleButton);
         } else if (userType === 'Administrador') {
-            // Agrega la lógica para el administrador si es necesario
+            const optionsMessage = document.createElement('p');
+            optionsMessage.textContent = 'Eres un Administrador. Puedes insertar, actualizar y borrar artículos.';
+            optionsMessage.style.fontWeight = 'bold';
+            container.prepend(optionsMessage);
+            
+            const addArticleButton = document.createElement('button');
+            addArticleButton.textContent = 'Agregar Artículo';
+            addArticleButton.addEventListener('click', mostrarFormularioArticulo);
+            container.appendChild(addArticleButton);
+            
+            // Agregar la opción de actualizar artículos
+            const updateArticleButton = document.createElement('button');
+            updateArticleButton.textContent = 'Actualizar Artículo';
+            updateArticleButton.addEventListener('click', mostrarFormularioActualizarArticulo);
+            container.appendChild(updateArticleButton);
+            
+            // Agregar la opción de borrar artículos
+            const deleteArticleButton = document.createElement('button');
+            deleteArticleButton.textContent = 'Borrar Artículo';
+            deleteArticleButton.addEventListener('click', mostrarFormularioBorrarArticulo);
+            container.appendChild(deleteArticleButton);
         }
 
         // Aquí puedes agregar más condiciones para otros tipos de usuarios en el futuro
@@ -57,21 +77,34 @@ fetch('/api/articulos')
     });
 
 // Función para mostrar el formulario de agregar artículo
+// Función para mostrar el formulario de agregar artículo
 function mostrarFormularioArticulo() {
     // Aquí puedes implementar la lógica para mostrar el formulario
     const formContainer = document.createElement('div');
     formContainer.innerHTML = `
         <h3>Agregar Artículo</h3>
         <form id="add-article-form">
-            <div>
-                <label for="titulo">Título:</label>
+            <div class="input-group">
+                <label for="titulo">Título</label>
                 <input type="text" id="titulo" name="titulo" required>
             </div>
-            <div>
-                <label for="contenido">Contenido:</label>
+            <div class="input-group">
+                <label for="contenido">Contenido</label>
                 <textarea id="contenido" name="contenido" required></textarea>
             </div>
-            <button type="submit">Insertar Artículo</button>
+            <div class="input-group">
+                <label for="autor_id">Autor ID</label>
+                <input type="number" id="autor_id" name="autor_id" required>
+            </div>
+            <div class="input-group">
+                <label for="categoria_id">Categoría ID</label>
+                <input type="number" id="categoria_id" name="categoria_id" required>
+            </div>
+            <div class="input-group">
+                <label for="fechaPublicacion">Fecha de Publicación</label>
+                <input type="date" id="fechaPublicacion" name="fechaPublicacion" required>
+            </div>
+            <button type="submit">Agregar Artículo</button>
         </form>
     `;
     document.getElementById('articulos').appendChild(formContainer);
@@ -79,16 +112,27 @@ function mostrarFormularioArticulo() {
     // Manejar el envío del formulario
     document.getElementById('add-article-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        // Obtener los valores del formulario
         const titulo = document.getElementById('titulo').value;
         const contenido = document.getElementById('contenido').value;
+        const autor_id = document.getElementById('autor_id').value;
+        const categoria_id = document.getElementById('categoria_id').value;
+        const fechaPublicacion = document.getElementById('fechaPublicacion').value;
 
-        // Realiza la solicitud para insertar el artículo en el backend
+        // Realizar la solicitud para insertar el artículo en el backend
         const response = await fetch('/api/articulos', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ titulo, contenido })
+            body: JSON.stringify({
+                titulo,
+                contenido,
+                autor_id,
+                categoria_id,
+                fechaPublicacion
+            })
         });
 
         if (response.ok) {
@@ -96,7 +140,104 @@ function mostrarFormularioArticulo() {
             // Recargar los artículos
             location.reload();
         } else {
-            alert('Error al agregar el artículo');
+            const data = await response.json();
+            alert('Error al agregar el artículo: ' + data.message);
+        }
+    });
+}
+
+function mostrarFormularioActualizarArticulo() {
+    const formContainer = document.createElement('div');
+    formContainer.innerHTML = `
+        <h3>Actualizar Artículo</h3>
+        <form id="update-article-form">
+            <div class="input-group">
+                <label for="update-id">ID del Artículo</label>
+                <input type="number" id="update-id" name="update-id" required>
+            </div>
+            <div class="input-group">
+                <label for="update-titulo">Título</label>
+                <input type="text" id="update-titulo" name="update-titulo" required>
+            </div>
+            <div class="input-group">
+                <label for="update-contenido">Contenido</label>
+                <textarea id="update-contenido" name="update-contenido" required></textarea>
+            </div>
+            <div class="input-group">
+                <label for="update-fechaPublicacion">Fecha de Publicación</label>
+                <input type="date" id="update-fechaPublicacion" name="update-fechaPublicacion" required>
+            </div>
+            <button type="submit">Actualizar Artículo</button>
+        </form>
+    `;
+    document.getElementById('articulos').appendChild(formContainer);
+
+    // Manejar el envío del formulario
+    document.getElementById('update-article-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Obtener los valores del formulario
+        const id = document.getElementById('update-id').value;
+        const titulo = document.getElementById('update-titulo').value;
+        const contenido = document.getElementById('update-contenido').value;
+        const fechaPublicacion = document.getElementById('update-fechaPublicacion').value;
+
+        // Realizar la solicitud para actualizar el artículo en el backend
+        const response = await fetch(`/api/articulos/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                titulo,
+                contenido,
+                fechaPublicacion
+            })
+        });
+
+        if (response.ok) {
+            alert('Artículo actualizado exitosamente');
+            location.reload(); // Recargar los artículos
+        } else {
+            const data = await response.json();
+            alert('Error al actualizar el artículo: ' + data.message);
+        }
+    });
+}
+
+
+function mostrarFormularioBorrarArticulo() {
+    const formContainer = document.createElement('div');
+    formContainer.innerHTML = `
+        <h3>Borrar Artículo</h3>
+        <form id="delete-article-form">
+            <div class="input-group">
+                <label for="delete-id">ID del Artículo</label>
+                <input type="number" id="delete-id" name="delete-id" required>
+            </div>
+            <button type="submit">Borrar Artículo</button>
+        </form>
+    `;
+    document.getElementById('articulos').appendChild(formContainer);
+
+    // Manejar el envío del formulario
+    document.getElementById('delete-article-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Obtener el ID del formulario
+        const id = document.getElementById('delete-id').value;
+
+        // Realizar la solicitud para borrar el artículo en el backend
+        const response = await fetch(`/api/articulos/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            alert('Artículo borrado exitosamente');
+            location.reload(); // Recargar los artículos
+        } else {
+            const data = await response.json();
+            alert('Error al borrar el artículo: ' + data.message);
         }
     });
 }

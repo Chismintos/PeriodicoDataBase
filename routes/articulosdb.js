@@ -22,20 +22,38 @@ function checkRole(role) {
 }
 
 // Ruta para crear artículos (solo para 'developer_role')
-router.post('/', checkRole('developer_role'), (req, res) => {
-    const { titulo, contenido, autor_id, categoria_id } = req.body;
-    const query = 'INSERT INTO Articulos (titulo, contenido, autor_id, categoria_id, fechaPublicacion) VALUES (?, ?, ?, ?, NOW())';
-    connection.query(query, [titulo, contenido, autor_id, categoria_id], (error, results) => {
-        if (error) {
-            return res.status(500).json({ message: 'Error al crear el artículo', error });
+router.post('/', (req, res) => {
+    const { titulo, contenido, autor_id, categoria_id, fechaPublicacion } = req.body;
+
+    const query = 'INSERT INTO Articulos (titulo, contenido, autor_id, categoria_id, fechaPublicacion) VALUES (?, ?, ?, ?, ?)';
+    
+    connection.query(query, [titulo, contenido, autor_id, categoria_id, fechaPublicacion], (err, result) => {
+        if (err) {
+            console.error('Error al insertar el artículo:', err);
+            return res.status(500).json({ message: 'Error al insertar el artículo' });
         }
-        res.status(201).json({ message: 'Artículo creado exitosamente', articulo_id: results.insertId });
+        res.status(200).json({ message: 'Artículo agregado exitosamente' });
     });
 });
 
-// Ruta para obtener todos los artículos (acceso general)
+
+
+
+// Ruta para obtener todos los artículos con el nombre del autor
 router.get('/', (req, res) => {
-    const query = 'SELECT * FROM Articulos';
+    const query = `
+        SELECT 
+            Articulos.articulo_id, 
+            Articulos.titulo, 
+            Articulos.contenido, 
+            Autores.nombre AS autor,  -- Aquí obtenemos el nombre del autor
+            Articulos.fechaPublicacion 
+        FROM 
+            Articulos
+        JOIN 
+            Autores ON Articulos.autor_id = Autores.autor_id;  -- Relación entre Articulos y Autores
+    `;
+
     connection.query(query, (error, results) => {
         if (error) {
             return res.status(500).json({ message: 'Error al obtener artículos', error });
@@ -44,20 +62,34 @@ router.get('/', (req, res) => {
     });
 });
 
+
 // Ruta para obtener un artículo por ID (acceso general)
-router.get('/:id', (req, res) => {
-    const { id } = req.params;
-    const query = 'SELECT * FROM Articulos WHERE articulo_id = ?';
-    connection.query(query, [id], (error, results) => {
-        if (error) {
-            return res.status(500).json({ message: 'Error al obtener el artículo', error });
+
+
+router.get('/api/articulos', (req, res) => {
+    const query = `
+        SELECT 
+            Articulos.articulo_id, 
+            Articulos.titulo, 
+            Articulos.contenido, 
+            Autores.nombre AS autor,  -- Aquí se obtiene el nombre del autor
+            Articulos.fechaPublicacion 
+        FROM 
+            Articulos
+        JOIN 
+            Autores ON Articulos.autor_id = Autores.autor_id;  -- Join entre Articulos y Autores
+    `;
+
+    connection.query(query, (err, results) => {
+        if (err) {
+            console.error('Error al obtener los artículos:', err);
+            res.status(500).json({ error: 'Error al obtener los artículos' });
+        } else {
+            res.json(results);  // Aquí se devuelven los resultados con el nombre del autor
         }
-        if (results.length === 0) {
-            return res.status(404).json({ message: 'Artículo no encontrado' });
-        }
-        res.status(200).json(results[0]);
     });
 });
+
 
 // Ruta para actualizar un artículo (solo para 'developer_role')
 router.put('/:id', checkRole('developer_role'), (req, res) => {
