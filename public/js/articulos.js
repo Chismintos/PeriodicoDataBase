@@ -23,8 +23,9 @@ fetch('/api/articulos')
             const articleElement = document.createElement('article');
             articleElement.innerHTML = `
                 <h2>${articulo.titulo}</h2>
+                
                 <p>${articulo.contenido}</p>
-                <p>Autor: ${articulo.autor} | Fecha: ${new Date(articulo.fechaPublicacion).toLocaleDateString()}</p>
+                <p>Autor: ${articulo.autor} | Fecha: ${new Date(articulo.fechaPublicacion).toLocaleDateString()} | Id: ${articulo.articulo_id} </p> 
             `;
             container.appendChild(articleElement);
         });
@@ -76,7 +77,6 @@ fetch('/api/articulos')
         console.error('Error al cargar los artículos:', error);
     });
 
-// Función para mostrar el formulario de agregar artículo
 // Función para mostrar el formulario de agregar artículo
 function mostrarFormularioArticulo() {
     // Aquí puedes implementar la lógica para mostrar el formulario
@@ -146,10 +146,14 @@ function mostrarFormularioArticulo() {
     });
 }
 
+
 function mostrarFormularioActualizarArticulo() {
     const formContainer = document.createElement('div');
     formContainer.innerHTML = `
         <h3>Actualizar Artículo</h3>
+        <head>
+        <link rel="stylesheet" type="text/css" href="styles.css">
+        </head>
         <form id="update-article-form">
             <div class="input-group">
                 <label for="update-id">ID del Artículo</label>
@@ -167,6 +171,14 @@ function mostrarFormularioActualizarArticulo() {
                 <label for="update-fechaPublicacion">Fecha de Publicación</label>
                 <input type="date" id="update-fechaPublicacion" name="update-fechaPublicacion" required>
             </div>
+            <div class="input-group">
+                <label for="update-autor_id">ID del Autor</label>
+                <input type="number" id="update-autor_id" name="update-autor_id" required>
+            </div>
+            <div class="input-group">
+                <label for="update-categoria_id">ID de la Categoría</label>
+                <input type="number" id="update-categoria_id" name="update-categoria_id" required>
+            </div>
             <button type="submit">Actualizar Artículo</button>
         </form>
     `;
@@ -181,6 +193,8 @@ function mostrarFormularioActualizarArticulo() {
         const titulo = document.getElementById('update-titulo').value;
         const contenido = document.getElementById('update-contenido').value;
         const fechaPublicacion = document.getElementById('update-fechaPublicacion').value;
+        const autor_id = document.getElementById('update-autor_id').value; // Obtener ID del autor
+        const categoria_id = document.getElementById('update-categoria_id').value; // Obtener ID de la categoría
 
         // Realizar la solicitud para actualizar el artículo en el backend
         const response = await fetch(`/api/articulos/${id}`, {
@@ -191,7 +205,10 @@ function mostrarFormularioActualizarArticulo() {
             body: JSON.stringify({
                 titulo,
                 contenido,
-                fechaPublicacion
+                autor_id, // Enviar ID del autor
+                categoria_id,
+                fechaPublicacion,
+                
             })
         });
 
@@ -204,7 +221,6 @@ function mostrarFormularioActualizarArticulo() {
         }
     });
 }
-
 
 function mostrarFormularioBorrarArticulo() {
     const formContainer = document.createElement('div');
@@ -223,21 +239,41 @@ function mostrarFormularioBorrarArticulo() {
     // Manejar el envío del formulario
     document.getElementById('delete-article-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-
+    
         // Obtener el ID del formulario
         const id = document.getElementById('delete-id').value;
-
+        console.log('ID a borrar:', id); // Para depuración
+    
         // Realizar la solicitud para borrar el artículo en el backend
-        const response = await fetch(`/api/articulos/${id}`, {
-            method: 'DELETE'
-        });
-
-        if (response.ok) {
-            alert('Artículo borrado exitosamente');
-            location.reload(); // Recargar los artículos
-        } else {
-            const data = await response.json();
-            alert('Error al borrar el artículo: ' + data.message);
+        try {
+            const response = await fetch(`/api/articulos/${id}`, {
+                method: 'DELETE'
+            });
+    
+            if (response.ok) {
+                alert('Artículo borrado exitosamente');
+                location.reload(); // Recargar los artículos
+            } else {
+                const data = await response.json();
+                alert('Error al borrar el artículo: ' + data.message);
+                console.error('Error en la eliminación:', data); // Para ver detalles en la consola
+            }
+        } catch (error) {
+            console.error('Error en la solicitud:', error); // Captura cualquier error de red
+            alert('Error en la solicitud de eliminación.');
         }
     });
+    
 }
+
+
+async function obtenerArticulo(id) {
+    const response = await fetch(`/api/articulos/${id}`);
+    const articulo = await response.json();
+
+    // Rellenar el formulario con los datos del artículo
+    document.getElementById('update-titulo').value = articulo.titulo;
+    document.getElementById('update-contenido').value = articulo.contenido;
+    document.getElementById('update-fechaPublicacion').value = articulo.fechaPublicacion;
+}
+

@@ -10,17 +10,6 @@ const connection = mysql.createConnection({
     database: 'periodico'
 });
 
-// Middleware para verificar roles
-function checkRole(role) {
-    return (req, res, next) => {
-        if (req.session.role === role) {
-            next(); // El usuario tiene el rol adecuado
-        } else {
-            res.status(403).json({ message: 'Acceso denegado' }); // Acceso denegado
-        }
-    };
-}
-
 // Ruta para crear artículos (solo para 'developer_role')
 router.post('/', (req, res) => {
     const { titulo, contenido, autor_id, categoria_id, fechaPublicacion } = req.body;
@@ -35,9 +24,6 @@ router.post('/', (req, res) => {
         res.status(200).json({ message: 'Artículo agregado exitosamente' });
     });
 });
-
-
-
 
 // Ruta para obtener todos los artículos con el nombre del autor
 router.get('/', (req, res) => {
@@ -62,41 +48,48 @@ router.get('/', (req, res) => {
     });
 });
 
-
-// Ruta para obtener un artículo por ID (acceso general)
-
-
-router.get('/api/articulos', (req, res) => {
-    const query = `
-        SELECT 
-            Articulos.articulo_id, 
-            Articulos.titulo, 
-            Articulos.contenido, 
-            Autores.nombre AS autor,  -- Aquí se obtiene el nombre del autor
-            Articulos.fechaPublicacion 
-        FROM 
-            Articulos
-        JOIN 
-            Autores ON Articulos.autor_id = Autores.autor_id;  -- Join entre Articulos y Autores
-    `;
-
-    connection.query(query, (err, results) => {
-        if (err) {
-            console.error('Error al obtener los artículos:', err);
-            res.status(500).json({ error: 'Error al obtener los artículos' });
-        } else {
-            res.json(results);  // Aquí se devuelven los resultados con el nombre del autor
-        }
-    });
-});
-
-
-// Ruta para actualizar un artículo (solo para 'developer_role')
-router.put('/:id', checkRole('developer_role'), (req, res) => {
+// Ruta para actualizar un artículo (sin verificación de rol)
+router.put('/:id', (req, res) => {
     const { id } = req.params;
-    const { titulo, contenido, autor_id, categoria_id } = req.body;
-    const query = 'UPDATE Articulos SET titulo = ?, contenido = ?, autor_id = ?, categoria_id = ? WHERE articulo_id = ?';
-    connection.query(query, [titulo, contenido, autor_id, categoria_id, id], (error, results) => {
+    const { titulo, contenido, autor_id, categoria_id, fechaPublicacion } = req.body;
+    
+    // Crear un array para almacenar las partes del query y los valores a actualizar
+    const updates = [];
+    const values = [];
+
+    // Solo agregar los campos que se han enviado
+    if (titulo) {
+        updates.push('titulo = ?');
+        values.push(titulo);
+    }
+    if (contenido) {
+        updates.push('contenido = ?');
+        values.push(contenido);
+    }
+    if (autor_id) {
+        updates.push('autor_id = ?');
+        values.push(autor_id);
+    }
+    if (categoria_id) {
+        updates.push('categoria_id = ?');
+        values.push(categoria_id);
+    }
+    if (fechaPublicacion) {
+        updates.push('fechaPublicacion = ?');
+        values.push(fechaPublicacion);
+    }
+
+    // Asegurarse de que haya al menos un campo para actualizar
+    if (updates.length === 0) {
+        return res.status(400).json({ message: 'No se proporcionaron campos para actualizar' });
+    }
+
+    // Agregar el id al final de los valores
+    values.push(id);
+
+    const query = `UPDATE Articulos SET ${updates.join(', ')} WHERE articulo_id = ?`;
+    
+    connection.query(query, values, (error, results) => {
         if (error) {
             return res.status(500).json({ message: 'Error al actualizar el artículo', error });
         }
@@ -107,10 +100,12 @@ router.put('/:id', checkRole('developer_role'), (req, res) => {
     });
 });
 
-// Ruta para eliminar un artículo (solo para 'developer_role')
-router.delete('/:id', checkRole('developer_role'), (req, res) => {
+
+// Ruta para eliminar un artículo (sin verificación de rol)
+router.delete('/:id', (req, res) => {
     const { id } = req.params;
     const query = 'DELETE FROM Articulos WHERE articulo_id = ?';
+    
     connection.query(query, [id], (error, results) => {
         if (error) {
             return res.status(500).json({ message: 'Error al eliminar el artículo', error });
