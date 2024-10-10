@@ -32,12 +32,12 @@ router.get('/', (req, res) => {
             Articulos.articulo_id, 
             Articulos.titulo, 
             Articulos.contenido, 
-            Autores.nombre AS autor,  -- Aquí obtenemos el nombre del autor
+            Autores.nombre AS autor,  
             Articulos.fechaPublicacion 
         FROM 
             Articulos
         JOIN 
-            Autores ON Articulos.autor_id = Autores.autor_id;  -- Relación entre Articulos y Autores
+            Autores ON Articulos.autor_id = Autores.autor_id;  
     `;
 
     connection.query(query, (error, results) => {

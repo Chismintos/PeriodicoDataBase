@@ -10,7 +10,7 @@ fetch('/api/articulos')
         const userType = localStorage.getItem('userType'); // Obtiene el tipo de usuario
         
         // Imprimir el userType en la consola
-        console.log('User Type:', userType); // Esto mostrará el tipo de usuario en la consola
+        console.log(' User Type:', userType); // Esto mostrará el tipo de usuario en la consola
 
         // Verificar si hay datos
         if (data.length === 0) {

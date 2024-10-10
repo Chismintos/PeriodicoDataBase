@@ -3,6 +3,7 @@ const path = require('path');
 const session = require('express-session');
 const mysql = require('mysql2');
 const articulosRoutes = require('./routes/articulosdb');
+const { log } = require('console');
 
 const app = express();
 app.set('port', 3000);
@@ -70,22 +71,25 @@ app.post('/api/login', (req, res) => {
         // Dependiendo del usuario conectado, asignar un tipo de usuario
         let userType;
         if (username === 'userDesarrollador') {
-            userType = 'Desarrollador'; // Cambiado a 'Desarrollador'
+            userType = 'Desarrollador';
         } else if (username === 'userLectura') {
-            userType = 'Lector'; // Cambiado a 'Lector'
+            userType = 'Lector';
         } else if (username === 'userDBA') {
-            userType = 'Administrador'; // Cambiado a 'Administrador'
+            userType = 'Administrador';
         }
 
         // Guardar el tipo de usuario en sesión
         req.session.userType = userType;
-        
+        console.log(' USER Type:', userType); 
+
         // Puedes usar la conexión más adelante si lo necesitas
         connection.end();  // Cierra la conexión después de la autenticación
         
-        res.json({ message: 'Inicio de sesión exitoso', role: userType }); // Cambiado a 'role'
+        // Envía el tipo de usuario al cliente
+        res.json({ message: 'Inicio de sesión exitoso', role: userType });
     });
 });
+
 
 
 // Iniciar el servidor
