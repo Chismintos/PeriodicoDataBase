@@ -277,3 +277,44 @@ async function obtenerArticulo(id) {
     document.getElementById('update-fechaPublicacion').value = articulo.fechaPublicacion;
 }
 
+let articuloAgregado = false; // Variable para rastrear si se ha agregado un artículo
+
+function agregarArticulo(event) {
+    event.preventDefault(); // Evita el envío del formulario
+
+    if (articuloAgregado) {
+        // Si ya se agregó un artículo, mostrar un mensaje y salir
+        document.getElementById('mensaje').innerText = "Ya se ha agregado un artículo. No puedes agregar más.";
+        return false; // Detiene la ejecución
+    }
+
+    // Obtener los datos del formulario
+    const titulo = document.getElementById('titulo').value;
+    const contenido = document.getElementById('contenido').value;
+
+    // Enviar el artículo al servidor
+    fetch('/api/articulos', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            titulo,
+            contenido,
+            // Puedes agregar más campos como autor_id, categoria_id y fechaPublicacion según sea necesario
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            // Mostrar un mensaje de éxito
+            document.getElementById('mensaje').innerText = data.message;
+            articuloAgregado = true; // Cambiar el estado a agregado
+            document.getElementById('articuloForm').reset(); // Limpiar el formulario
+        }
+    })
+    .catch(error => {
+        console.error('Error al agregar el artículo:', error);
+        document.getElementById('mensaje').innerText = "Error al agregar el artículo.";
+    });
+}

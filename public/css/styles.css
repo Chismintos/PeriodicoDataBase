@@ -7,77 +7,6 @@ body {
     color: #333;
 }
 
-/* Header styles */
-header {
-    background-color: #0044cc;
-    color: white;
-    padding: 20px;
-    text-align: center;
-}
-
-header h1 {
-    margin: 0;
-}
-
-/* Articles container styles */
-main {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: white;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-}
-
-/* Articles section styles */
-#articulos {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-}
-
-article {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    width: 300px;
-    transition: transform 0.2s;
-}
-
-article:hover {
-    transform: translateY(-5px);
-}
-
-article h2 {
-    margin-top: 0;
-    font-size: 1.5em;
-    color: #0044cc;
-}
-
-article p {
-    line-height: 1.6;
-}
-
-article p:last-child {
-    font-size: 0.9em;
-    color: #777;
-}
-
-/* Footer styles */
-footer {
-    background-color: #0044cc;
-    color: white;
-    text-align: center;
-    padding: 10px 0;
-    margin-top: 30px;
-}
-
-footer p {
-    margin: 0;
-}
-
 /* Styles specific for login page */
 body.login-page {
     background-color: #f0f0f0;
@@ -153,74 +82,77 @@ body.login-page p a:hover {
         flex-direction: column;
         align-items: center;
     }
-    
+
     article {
         width: 100%;
     }
 }
 
-.modal-content {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    border: 1px solid #888;
-    padding: 20px;
-    z-index: 1;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-}
-
-#articleFormModal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.articulo {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 10px;
-}
-
-.articulo h4, .articulo p {
+/* Styles for articles */
+* {
+    box-sizing: border-box;
     margin: 0;
-    padding-right: 20px;
+    padding: 0;
 }
 
-.articulo button {
-    margin-left: 10px;
+header {
+    background: #007bff;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
 }
 
-/* Estilo para todos los botones */
+h1 {
+    margin: 0;
+}
+
+.articulo-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+article {
+    margin-bottom: 20px;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+article h2 {
+    margin-bottom: 10px;
+    color: #007bff;
+}
+
+input[type="text"], input[type="number"], input[type="date"], textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
 button {
-    padding: 10px 15px;
-    background-color: #007bff; /* Color de fondo */
-    color: white; /* Color del texto */
-    border: none; /* Sin borde */
-    border-radius: 5px; /* Bordes redondeados */
-    cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
-    font-size: 16px; /* Tamaño de la fuente */
-    transition: background-color 0.3s, transform 0.2s; /* Transiciones suaves */
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
-/* Efecto al pasar el cursor sobre el botón */
 button:hover {
-    background-color: #0056b3; /* Color de fondo al pasar el cursor */
-    transform: translateY(-2px); /* Eleva el botón ligeramente */
+    background: #0056b3;
 }
 
-/* Estilos específicos para botones en formularios */
-form button {
-    width: 100%; /* Hacer que el botón ocupe todo el ancho del formulario */
+footer {
+    text-align: center;
+    padding: 20px;
+    background: #007bff;
+    color: white;
+    position: relative;
+    bottom: 0;
+    width: 100%;
 }
